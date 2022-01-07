@@ -39,3 +39,31 @@
     background-color: rgba(0, 128, 0, 0.411);
     
 }
+
+.iconContainer{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 5px solid azure;
+    
+}
+
+.waldo{
+    background-image: url(img/waldo.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+.odlaw{
+    background-image: url(img/odlaw.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+.wizard{
+    background-image: url(img/wizard.jpeg);
+    background-size: cover;
+    background-position: center;
+    
+}
+
