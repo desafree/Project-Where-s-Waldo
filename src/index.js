@@ -1,5 +1,5 @@
 import {initializeApp} from 'firebase/app'
-import {getFirestore,collection,doc,getDoc} from 'firebase/firestore'
+import {getFirestore,collection,doc,getDoc,serverTimestamp,addDoc,updateDoc, Timestamp, deleteDoc} from 'firebase/firestore'
 
 const firebaseConfig = {
 
@@ -21,10 +21,15 @@ initializeApp(firebaseConfig);
 
 const db = getFirestore();
 const colRef = collection(db,'cordinations')
+let idSession = ''
 // const docRef = doc(db,'cordinations', '1')
 // getDoc(docRef).then((doc)=>{
 //     console.log(doc.data(),doc.id)
 // })
+
+
+const colRef2 = collection(db,'time')
+addDoc(colRef2, {name:'anonymous',startAt:serverTimestamp(), endAt:0}).then((doc)=>{idSession=doc.id})
 
 
 
@@ -39,10 +44,12 @@ image.addEventListener('click', (e)=>{
     console.log(cordX,cordY)
 })
 
-
+let validTime = 0;
 
 
 function createCircle(x,y) {
+
+    
     let removeCircle = document.querySelectorAll('.circle')
     removeCircle.forEach(item=>{
         item.remove()
@@ -63,7 +70,7 @@ function createCircle(x,y) {
     image.appendChild(circle)
 
     createSelect(x,y)
-    
+
     
     const options = document.querySelectorAll('.list__option')
     options.forEach((option)=>{
@@ -73,6 +80,7 @@ function createCircle(x,y) {
             circle.classList.remove('circle');
             circle.classList.add('circleVer');
             checkValid(option,x,y)
+
         })
 
     })
@@ -80,13 +88,29 @@ function createCircle(x,y) {
     function checkValid(e,x,y) {
         console.log(e)
         const docRef = doc(db,'cordinations', e.id)
-        getDoc(docRef).then((doc)=>{
-            const response = doc.data()
-            if(response.x >= x-25 && response.x <= x+25) {
-                if(response.y >= y-25 && response.y <= y+25) {
+        getDoc(docRef).then((docu)=>{
+            const response = docu.data()
+            console.log(x,y)
+            if((response.x >= x-25 && response.x <= x+25)&&(response.y >= y-25 && response.y <= y+25)) {
+                
                     let classRef = '.' + e.textContent
-                    valid(classRef)
-                }
+                    valid(classRef);
+                    validTime++;
+                    console.log(validTime)
+                    if(validTime==3) {
+                        const decRef = doc(db,'time',idSession)
+                        updateDoc(decRef,{endAt:serverTimestamp()}).then(()=>{
+                            getDoc(decRef).then((doc)=>{
+                                console.log(doc.data().endAt)
+                                console.log(doc.data().startAt)
+                                alert('you won in ' + (Math.round(doc.data().endAt-doc.data().startAt))+' seconds')
+                                deleteDoc(decRef)
+                            })
+                        })
+                        
+                        
+                    }
+                
             }
             else{
                 invalid()
